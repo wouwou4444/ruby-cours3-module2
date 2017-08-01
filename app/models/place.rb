@@ -24,6 +24,36 @@ class Place
 		self.collection.insert_many(hash)
 	end
 
+	def self.find_by_short_name s_name
+		self.collection.find().aggregate([
+		{:$match => {"address_components.short_name"=> {:$regex => s_name} }}
+		])
+		self.collection.find(
+		{"address_components.short_name"=> {:$regex => s_name} }
+		)
+	end
+
+	def self.to_places places
+		col = []
+		places.each { |p| col << Place.new(p)}
+		return col
+	end
+
+	def self.find id
+		Place.new(self.collection.find(:_id => BSON::ObjectId.from_string(id)).first)
+	end
+
+	def self.all (offset=0, limit="unlimited")
+		if (limit == "unlimited")
+			self.to_places(self.collection.find.skip(offset))
+		else
+			self.to_places(self.collection.find.skip(offset).limit(limit))
+		end
+	end
+
+	def destroy
+		Place.find(:_id => @id).delete_one
+	end
 end 
 
 
