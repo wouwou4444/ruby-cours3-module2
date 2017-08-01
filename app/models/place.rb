@@ -40,7 +40,7 @@ class Place
 	end
 
 	def self.find id
-		Place.new(self.collection.find(:_id => BSON::ObjectId.from_string(id)).first)
+		self.new(self.collection.find(:_id => BSON::ObjectId.from_string(id)).first)
 	end
 
 	def self.all (offset=0, limit="unlimited")
@@ -52,7 +52,7 @@ class Place
 	end
 
 	def destroy
-		Place.find(:_id => @id).delete_one
+		Place.collection.find(:_id=>BSON::ObjectId.from_string(@id)).delete_one
 	end
 end 
 
