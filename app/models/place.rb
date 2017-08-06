@@ -130,14 +130,17 @@ class Place
 	end
 
 	def self.near (point, max_meters="unlimited")
-		if max_meters == "unlimited"
+		Rails.logger.debug {"point: #{point}, max_meters: #{max_meters}"}
+		if ( max_meters == "unlimited" && !point.nil? )
+			Rails.logger.debug {"point: #{point} not nil?, max_meters: #{max_meters} unlimited"}
 			self.collection.find("geometry.geolocation"=>
 			{:$near=>
 				{
 					:$geometry=>point.to_hash
 				}
 			})
-		else
+		elsif ( !point.nil? )
+			Rails.logger.debug {"point: #{point} not nil?, max_meters: #{max_meters} value given"}
 			self.collection.find("geometry.geolocation"=>
 			{:$near=>
 				{
@@ -145,6 +148,9 @@ class Place
 					:$maxDistance=>max_meters
 				}
 			})
+		else
+			Rails.logger.debug {"point: #{point}, max_meters: #{max_meters} other cases"}
+			return nil
 		end
 	end
 
@@ -155,6 +161,8 @@ class Place
 			Place.to_places(Place.near(@location, max_meters))
 		end
 	end
+
+
 end 
 
 
