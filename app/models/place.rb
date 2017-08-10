@@ -1,6 +1,10 @@
 class Place
-
+	include ActiveModel::Model
 	attr_accessor :id, :formatted_address, :location, :address_components
+
+	def persisted?
+		!@id.nil?
+	end
 
 	def initialize params
 		@id = params[:_id].to_s
@@ -162,7 +166,14 @@ class Place
 		end
 	end
 
+	def photos (offset=0, limit="unbounded")
 
+		photos = Photo.find_photos_for_place(@id).skip(offset).map { |photo| Photo.new photo } if limit == "unbounded"
+		photos = Photo.find_photos_for_place(@id).skip(offset).limit(limit).map { |photo| Photo.new photo } if limit != "unbounded"
+		return photos
+
+	end
 end 
 
 
+	
